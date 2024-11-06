@@ -68,5 +68,5 @@ luac.out
 test*
 test/*
 
-# 还没有通过隐私信息检查
-ident-me-lua
+# 现在可用了
+# ident-me-lua

@@ -1,0 +1,62 @@
+#!/bin/sh
+set -e
+
+### BEGIN INIT INFO
+# Provides:           moncak
+# Required-Start:     $syslog $remote_fs $network $local_fs
+# Required-Stop:      $syslog $remote_fs $network $local_fs
+# Default-Start:      2 3 4 5
+# Default-Stop:       0 1 6
+# Short-Description:  Start ident-me-lua by moncak 
+# Description:
+#   starts ident-me-lua
+### END INIT INFO
+
+NAME=ident-me-lua
+DAEMON="/usr/bin/lua5.4" # 其它版本理论上也可以，但是我还没测试
+DAEMON_OPTS="/path/to/ident_me.lua" # 你的脚本路径
+PIDFILE="/var/run/ident-me-lua.pid"
+DESC="ident-me service by moncak"
+
+test -x $DAEMON || exit 0
+
+. /lib/lsb/init-functions
+
+do_start() {
+  log_daemon_msg "Starting $DESC" $NAME
+  start-stop-daemon --start --quiet --exec $DAEMON --pidfile $PIDFILE --background --make-pidfile --startas $DAEMON -- $DAEMON_OPTS
+  log_end_msg $?
+}
+
+do_stop() {
+  log_daemon_msg "Stopping $DESC" $NAME
+  start-stop-daemon --stop  --quiet --oknodo --exec $DAEMON --pidfile $PIDFILE 
+  log_end_msg $?
+}
+
+do_status() {
+  status_of_proc -p $PIDFILE $DAEMON $NAME
+}
+
+#do_restart() {
+#  $0 stop && sleep 1 && $0 start
+#}
+
+case "$1" in
+    start)
+        do_start
+        ;;
+    stop)
+        do_stop
+        ;;
+    status)
+        do_status
+        ;;
+#    restart)
+#        do_restart
+#        ;;
+    *)
+        echo "Usage: /etc/init.d/$NAME {start|stop|status}"
+        exit 1
+        ;;
+esac
